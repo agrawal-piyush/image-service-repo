@@ -1,0 +1,30 @@
+services:
+  localstack:
+    container_name: image-service-localstack
+    image: localstack/localstack:3.8
+    # Put LocalStack on an explicit, named network so the Lambda containers it
+    # spawns can be placed on the SAME network (see LAMBDA_DOCKER_NETWORK below).
+    # On Docker Desktop + WSL2 the default "bridge" causes LocalStack to be
+    # unable to reach its own Lambda containers (invoke times out on 172.17.x.x).
+    networks:
+      - ls-net
+    ports:
+      - "4566:4566"            # single edge port for all AWS services
+    environment:
+      # Services we need for this project.
+      - SERVICES=s3,dynamodb,lambda,apigateway,iam,sts,logs,cloudwatch
+      - DEBUG=0
+      - LAMBDA_RUNTIME_ENVIRONMENT_TIMEOUT=60
+      # Lambda containers MUST share LocalStack's network so it can invoke them.
+      # Keep this value identical to the network name defined below.
+      - LAMBDA_DOCKER_NETWORK=ls-net
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    volumes:
+      - "./.localstack-data:/var/lib/localstack"
+      # Lambda in LocalStack is executed via Docker, so the socket is mounted.
+      - "/var/run/docker.sock:/var/run/docker.sock"
+
+networks:
+  ls-net:
+    name: ls-net
+    driver: bridge

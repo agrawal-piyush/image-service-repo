@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+# Build artifacts
+build/
+*.zip
+
+# LocalStack
+.localstack-data/
+.api_base_url
+
+# OS
+.DS_Store
+
+# Secrets / env
+.env
+*.env
+
+# Logs
+*.log
